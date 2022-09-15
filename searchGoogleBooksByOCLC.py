@@ -20,7 +20,7 @@ key = googleKey.key
 baseURL = 'https://www.googleapis.com/books/v1/volumes?q='
 
 # Reads CSV as DataFrame, grabs OCLC identifiers from column named "oclc_id."
-df = pd.read_csv(filename)
+df = pd.read_csv(filename, dtype={'oclc_id': str})
 df.dropna(subset=['oclc_id'], inplace=True)   # Drop blank values.
 oclc_identifiers = df['oclc_id'].unique()
 oclc_identifiers = list(oclc_identifiers)
@@ -37,18 +37,18 @@ print(list_x)
 all_results = []
 for index, identifier in enumerate(oclc_identifiers):
     print(index, identifier)
-    identifier = str(identifier).strip()
+    identifier = identifier.strip()
     results = requests.get(baseURL+'oclc:'+identifier+'&key='+key).json()
     print(results)
     if results['totalItems'] > 0:
         for item in results['items']:
             result = {'oclc': identifier}
-            result['link'] = item['selfLink']
             metadata = item['volumeInfo']
-            result['title'] = metadata.get('title')
-            result['authors'] = metadata.get('authors')
-            result['publisher'] = metadata.get('publisher')
-            result['date'] = metadata.get('publishedDate')
+            result['GB_link'] = metadata.get('canonicalVolumeLink')
+            result['GB_title'] = metadata.get('title')
+            result['GB_authors'] = metadata.get('authors')
+            result['GB_publisher'] = metadata.get('publisher')
+            result['GB_date'] = metadata.get('publishedDate')
             all_results.append(result)
     if index+1 in list_x:
         time.sleep(60)

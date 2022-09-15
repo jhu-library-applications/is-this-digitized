@@ -15,7 +15,7 @@ else:
     filename = input('Enter filename (including \'.csv\'): ')
 
 # Reads CSV as DataFrame, grabs OCLC identifiers from column named "oclc_id."
-df = pd.read_csv(filename)
+df = pd.read_csv(filename, dtype={'oclc_id': str})
 df.dropna(subset=['oclc_id'], inplace=True)  # Drop blank values.
 oclc_identifiers = df['oclc_id'].unique()
 oclc_identifiers = list(oclc_identifiers)
@@ -28,7 +28,7 @@ fields = ['identifier', 'title', 'date', 'language', 'publisher', 'source', 'con
 all_results = []
 for index, identifier in enumerate(oclc_identifiers):
     print(index, identifier)
-    identifier = str(identifier)
+    identifier = identifier.strip()
     params = {'rows': 10, 'page': 1}
     search = s.search_items('external-identifier:"urn:oclc:record:'+identifier+'"', params=params, fields=fields)
     for result in search:
@@ -42,4 +42,4 @@ for index, identifier in enumerate(oclc_identifiers):
 # Creates DataFrame from all_results.
 df_results = pd.DataFrame.from_dict(all_results)
 # Creates CSV called "internetArchiveResults.csv" from DataFrame.
-df_results.to_csv('internetArchiveResults_test.csv', index=False)
+df_results.to_csv('internetArchiveResults.csv', index=False)

@@ -19,7 +19,7 @@ else:
 hURL_brief = 'http://catalog.hathitrust.org/api/volumes/brief/oclc/'
 
 # Reads CSV as DataFrame, grabs OCLC identifiers from column named "oclc_id."
-df = pd.read_csv(filename)
+df = pd.read_csv(filename, dtype={'oclc_id': str})
 df.dropna(subset=['oclc_id'], inplace=True)   # Drop blank values.
 oclc_identifiers = df['oclc_id'].unique()
 oclc_identifiers = list(oclc_identifiers)
@@ -28,7 +28,7 @@ oclc_identifiers = list(oclc_identifiers)
 all_results = []
 for index, identifier in enumerate(oclc_identifiers):
     print(index, identifier)
-    identifier = str(identifier).strip()
+    identifier = identifier.strip()
     search_url = hURL_brief+identifier+'.json'
     h_response = requests.get(search_url).json()
     records = h_response.get('records')
@@ -40,6 +40,7 @@ for index, identifier in enumerate(oclc_identifiers):
             for k, v in record_values.items():
                 if isinstance(v, list):
                     v = '|'.join(v)
+                k = 'HT_'+k
                 result[k] = v
             all_results.append(result)
 
