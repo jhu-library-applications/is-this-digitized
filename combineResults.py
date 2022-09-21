@@ -20,16 +20,20 @@ def make_data_frame(frame_name, name_file):
         frame_name = pd.read_csv(name_file)
         abbrev = result_files.get(name_file)
         for index, row in frame_name.iterrows():
-            oclc = row[abbrev+'oclc']
-            link_name = abbrev+'link'
-            title_name = abbrev+'title'
+            oclc = row[abbrev+'_oclc']
+            link_name = abbrev+'_link'
+            title_name = abbrev+'_title'
             link = row[link_name]
-            result = {link_name: link, 'oclc_id': oclc}
+            title = row[title_name]
+            result = {link_name: link, 'oclc_id': oclc, title_name: title}
             all_results.append(result)
         frame_name = pd.DataFrame.from_dict(all_results)
         frame_name.drop_duplicates(inplace=True)
-        frame_name = pd.pivot_table(frame_name, index=['oclc_id'], values=link_name,
+        df_1 = pd.pivot_table(frame_name, index=['oclc_id'], values=link_name,
                                     aggfunc=lambda x: '|'.join(str(v) for v in x))
+        df_2 = pd.pivot_table(frame_name, index=['oclc_id'], values=title_name,
+                                    aggfunc=lambda x: '|'.join(str(v) for v in x))
+        frame_name = pd.merge(df_1, df_2, how='outer', on='oclc_id')
         frames.append(frame_name)
     except pd.errors.EmptyDataError:
         pass
@@ -55,4 +59,4 @@ mergedFrame = merged[0]
 print(mergedFrame.columns)
 print(mergedFrame.head)
 dt = datetime.now().strftime('%Y-%m-%d %H.%M.%S')
-mergedFrame.to_csv('mergedMultiple_' + dt + '.csv')
+mergedFrame.to_csv('combinedResults_' + dt + '.csv')

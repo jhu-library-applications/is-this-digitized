@@ -3,6 +3,7 @@ import pandas as pd
 import argparse
 import requests
 import googleKey
+import math
 
 # This script searches Google Books for OCLC numbers from a CSV and creates a new CSV with the metadata of any matches.
 
@@ -25,8 +26,9 @@ df.dropna(subset=['oclc_id'], inplace=True)   # Drop blank values.
 oclc_identifiers = df['oclc_id'].unique()
 oclc_identifiers = list(oclc_identifiers)
 
+# Math to find when the script should pause for 60 seconds.
 x = len(oclc_identifiers)/100
-x = round(x)
+x = math.ceil(x)
 list_x = list(range(x))
 if 0 in list_x:
     list_x.remove(0)
@@ -40,15 +42,18 @@ for index, identifier in enumerate(oclc_identifiers):
     identifier = identifier.strip()
     results = requests.get(baseURL+'oclc:'+identifier+'&key='+key).json()
     print(results)
+    time.sleep(.5)
     if results['totalItems'] > 0:
         for item in results['items']:
-            result = {'oclc': identifier}
+            result = {'GB_oclc': identifier}
             metadata = item['volumeInfo']
             result['GB_link'] = metadata.get('canonicalVolumeLink')
             result['GB_title'] = metadata.get('title')
-            result['GB_authors'] = metadata.get('authors')
+            authors = metadata.get('authors')
+            authors = '|'.join(authors)
+            result['GB_authors'] = authors
             result['GB_publisher'] = metadata.get('publisher')
-            result['GB_date'] = metadata.get('publishedDate')
+            result['GB_publishDate'] = metadata.get('publishedDate')
             all_results.append(result)
     if index+1 in list_x:
         time.sleep(60)

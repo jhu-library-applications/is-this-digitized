@@ -46,5 +46,7 @@ for index, identifier in enumerate(oclc_identifiers):
 
 # Creates DataFrame from all_results.
 df_results = pd.DataFrame.from_dict(all_results)
+# Rename columns
+df_results.rename(columns={'HT_oclcs': 'HT_oclc', 'HT_titles': 'HT_title', 'HT_recordURL': 'HT_link'}, inplace=True)
 # Creates CSV called "hathiTrustResults.csv" from DataFrame.
 df_results.to_csv('hathiTrustResults.csv', index=False)
