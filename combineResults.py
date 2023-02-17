@@ -1,15 +1,5 @@
 import pandas as pd
-import argparse
 from datetime import datetime
-
-parser = argparse.ArgumentParser()
-parser.add_argument('-f', '--file', help='Enter filename with csv.')
-args = parser.parse_args()
-
-if args.file:
-    filename = args.file
-else:
-    filename = input('Enter filename (including \'.csv\'): ')
 
 result_files = {'internetArchiveResults.csv': 'AI', 'googleBooksResults.csv': 'GB', 'hathiTrustResults.csv': 'HT'}
 
@@ -21,6 +11,7 @@ def make_data_frame(frame_name, name_file):
         abbrev = result_files.get(name_file)
         for index, row in frame_name.iterrows():
             oclc = row[abbrev+'_oclc']
+            oclc = str(oclc)
             link_name = abbrev+'_link'
             title_name = abbrev+'_title'
             link = row[link_name]

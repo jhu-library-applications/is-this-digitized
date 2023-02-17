@@ -40,7 +40,7 @@ all_results = []
 for index, identifier in enumerate(oclc_identifiers):
     print(index, identifier)
     identifier = identifier.strip()
-    results = requests.get(baseURL+'oclc:'+identifier+'&key='+key).json()
+    results = requests.get(baseURL+'oclc:'+identifier+'&key='+key, timeout=3).json()
     print(results)
     time.sleep(.5)
     if results['totalItems'] > 0:
@@ -50,8 +50,9 @@ for index, identifier in enumerate(oclc_identifiers):
             result['GB_link'] = metadata.get('canonicalVolumeLink')
             result['GB_title'] = metadata.get('title')
             authors = metadata.get('authors')
-            authors = '|'.join(authors)
-            result['GB_authors'] = authors
+            if authors:
+                authors = '|'.join(authors)
+                result['GB_authors'] = authors
             result['GB_publisher'] = metadata.get('publisher')
             result['GB_publishDate'] = metadata.get('publishedDate')
             all_results.append(result)
